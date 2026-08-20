@@ -1,0 +1,9 @@
+@font-face { font-family: 'DM Sans'; src: url('/fonts/dm-sans/DMSans-Regular.ttf') format('truetype'); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: 'DM Sans'; src: url('/fonts/dm-sans/DMSans-Italic.ttf') format('truetype'); font-weight: 400; font-style: italic; font-display: swap; }
+@font-face { font-family: 'DM Sans'; src: url('/fonts/dm-sans/DMSans-Medium.ttf') format('truetype'); font-weight: 500; font-style: normal; font-display: swap; }
+@font-face { font-family: 'DM Sans'; src: url('/fonts/dm-sans/DMSans-MediumItalic.ttf') format('truetype'); font-weight: 500; font-style: italic; font-display: swap; }
+@font-face { font-family: 'DM Sans'; src: url('/fonts/dm-sans/DMSans-Bold.ttf') format('truetype'); font-weight: 700; font-style: normal; font-display: swap; }
+@font-face { font-family: 'DM Sans'; src: url('/fonts/dm-sans/DMSans-BoldItalic.ttf') format('truetype'); font-weight: 700; font-style: italic; font-display: swap; }
+@font-face { font-family: 'Libre Baskerville'; src: url('/fonts/libre-baskerville/LibreBaskerville-Regular.otf') format('opentype'); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Libre Baskerville'; src: url('/fonts/libre-baskerville/LibreBaskerville-Italic.otf') format('opentype'); font-weight: 400; font-style: italic; font-display: swap; }
+@font-face { font-family: 'Libre Baskerville'; src: url('/fonts/libre-baskerville/LibreBaskerville-Bold.otf') format('opentype'); font-weight: 700; font-style: normal; font-display: swap; }
