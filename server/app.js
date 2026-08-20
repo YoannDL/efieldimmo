@@ -4,6 +4,7 @@ const session = require('express-session');
 const { createDb } = require('./db');
 const { createAdminRouter } = require('./routes/admin');
 const { createPropertiesRouter } = require('./routes/properties');
+const { createInquiriesRouter } = require('./routes/inquiries');
 
 function createApp({ dbPath, sessionSecret }) {
   const db = createDb(dbPath);
@@ -21,6 +22,7 @@ function createApp({ dbPath, sessionSecret }) {
 
   app.use('/admin/api', createAdminRouter(db));
   app.use('/api/properties', createPropertiesRouter(db));
+  app.use('/api/inquiries', createInquiriesRouter(db));
 
   return { app, db };
 }
