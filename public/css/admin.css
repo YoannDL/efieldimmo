@@ -13,3 +13,9 @@ body.admin-body { background: var(--color-cream); }
 .image-thumb-row span { position: relative; }
 .image-thumb-row img { width: 80px; height: 60px; object-fit: cover; border-radius: 4px; }
 .image-thumb-row button { position: absolute; top: -6px; right: -6px; background: #b3261e; color: #fff; border: none; border-radius: 50%; width: 20px; height: 20px; cursor: pointer; }
+
+@media (max-width: 768px) {
+  .property-form-grid { grid-template-columns: 1fr; }
+  .admin-topbar { flex-wrap: wrap; gap: 1rem; }
+  .admin-table { min-width: 560px; }
+}

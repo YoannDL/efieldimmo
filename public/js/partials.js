@@ -13,6 +13,22 @@
     });
   }
 
+  function wireMobileNavToggle() {
+    const toggle = document.getElementById('nav-toggle');
+    const nav = document.getElementById('site-nav');
+    if (!toggle || !nav) return;
+    toggle.addEventListener('click', () => {
+      const isOpen = nav.classList.toggle('nav-open');
+      toggle.setAttribute('aria-expanded', String(isOpen));
+    });
+    nav.querySelectorAll('a').forEach((link) => {
+      link.addEventListener('click', () => {
+        nav.classList.remove('nav-open');
+        toggle.setAttribute('aria-expanded', 'false');
+      });
+    });
+  }
+
   window.EfieldPartials = {
     init: async function () {
       await Promise.all([
@@ -20,6 +36,7 @@
         includePartial('#site-footer', '/partials/footer.html')
       ]);
       highlightActiveNavLink();
+      wireMobileNavToggle();
       await window.EfieldI18n.init();
     }
   };
