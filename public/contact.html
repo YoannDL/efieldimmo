@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Contact — EFIELD IMMO</title>
+  <link rel="icon" href="/favicon.png">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <header class="site-header" id="site-header"></header>
+
+  <section class="section">
+    <div class="container" style="display:grid;grid-template-columns:1fr 1fr;gap:2rem;">
+      <div>
+        <p class="eyebrow" data-i18n="contact.eyebrow">CONTACTEZ-NOUS</p>
+        <h1 data-i18n="contact.title">Contactez-nous</h1>
+        <p data-i18n="contact.intro"></p>
+
+        <h3 data-i18n="contact.addressTitle"></h3>
+        <p data-i18n="contact.address"></p>
+        <h3 data-i18n="contact.phoneTitle"></h3>
+        <p>+230 XXX XXXX</p>
+        <p data-i18n="contact.phoneHours"></p>
+        <h3 data-i18n="contact.emailTitle"></h3>
+        <p>efieldimmo@gmail.com</p>
+        <p data-i18n="contact.emailNote"></p>
+        <p data-i18n="contact.consultNote"></p>
+        <p data-i18n="contact.langNote"></p>
+      </div>
+
+      <div>
+        <h2 data-i18n="contact.formTitle"></h2>
+        <form id="contact-form">
+          <div class="form-field"><label data-i18n="contact.nameLabel"></label><input type="text" name="name" data-i18n-placeholder="contact.namePlaceholder" required></div>
+          <div class="form-field"><label data-i18n="contact.emailLabel"></label><input type="email" name="email" required></div>
+          <div class="form-field"><label data-i18n="contact.phoneLabel"></label><input type="tel" name="phone"></div>
+          <div class="form-field"><label data-i18n="contact.projectTypeLabel"></label><input type="text" name="projectType" data-i18n-placeholder="contact.projectTypePlaceholder"></div>
+          <div class="form-field">
+            <label data-i18n="contact.budgetLabel"></label>
+            <select name="budgetRange">
+              <option value="under5" data-i18n="contact.budgetUnder5"></option>
+              <option value="5to15" data-i18n="contact.budget5to15"></option>
+              <option value="15to30" data-i18n="contact.budget15to30"></option>
+              <option value="over30" data-i18n="contact.budgetOver30"></option>
+            </select>
+          </div>
+          <div class="form-field"><label data-i18n="contact.messageLabel"></label><textarea name="message" rows="4" required></textarea></div>
+          <button type="submit" class="btn btn-primary" data-i18n="contact.sendButton"></button>
+          <p class="form-success" id="form-success" hidden data-i18n="contact.successMessage"></p>
+          <p class="form-error" id="form-error" hidden data-i18n="contact.errorMessage"></p>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <footer class="site-footer" id="site-footer"></footer>
+
+  <script src="/js/i18n.js"></script>
+  <script src="/js/partials.js"></script>
+  <script src="/js/contact.js"></script>
+  <script>document.addEventListener('DOMContentLoaded', () => window.EfieldPartials.init());</script>
+</body>
+</html>
