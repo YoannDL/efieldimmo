@@ -1,5 +1,121 @@
 <!doctype html>
 <html lang="fr">
-<head><meta charset="utf-8"><title>EFIELD IMMO</title></head>
-<body><p>EFIELD IMMO — site en construction</p></body>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>EFIELD IMMO — Immobilier à l'île Maurice</title>
+  <link rel="icon" href="/favicon.png">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <header class="site-header" id="site-header"></header>
+
+  <section class="hero" style="background-image:url('/img/brand/hero-home.png');">
+    <div class="container hero-content">
+      <h1 data-i18n="home.heroTitle">Donnez vie à votre projet immobilier à l'île Maurice</h1>
+      <p data-i18n="home.heroSubtitle">Que vous souhaitiez acheter un terrain, investir ou développer un projet, nous vous accompagnons à chaque étape avec expertise et transparence.</p>
+      <div class="hero-buttons">
+        <a class="btn btn-primary" href="/properties.html?status=sale&amp;type=residential-land" data-i18n="home.ctaLand">Voir nos terrains</a>
+        <a class="btn btn-outline" href="/contact.html" data-i18n="home.ctaProject">Confier mon projet</a>
+        <a class="btn btn-outline" href="/properties.html" data-i18n="home.ctaSearch">Rechercher un bien</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-header">
+        <p class="eyebrow" data-i18n="home.whyEyebrow">POURQUOI NOUS</p>
+        <h2 data-i18n="home.whyTitle">L'immobilier à Maurice, un projet de vie</h2>
+        <p data-i18n="home.whyIntro"></p>
+      </div>
+      <div class="stats-band">
+        <div class="stat"><div class="stat-number" data-i18n="home.stat1Number">150+</div><h3 data-i18n="home.stat1Label"></h3><p data-i18n="home.stat1Text"></p></div>
+        <div class="stat"><div class="stat-number" data-i18n="home.stat2Number">15+</div><h3 data-i18n="home.stat2Label"></h3><p data-i18n="home.stat2Text"></p></div>
+        <div class="stat"><div class="stat-number" data-i18n="home.stat3Number">100%</div><h3 data-i18n="home.stat3Label"></h3><p data-i18n="home.stat3Text"></p></div>
+        <div class="stat"><div class="stat-number" data-i18n="home.stat4Number">2x</div><h3 data-i18n="home.stat4Label"></h3><p data-i18n="home.stat4Text"></p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-alt">
+    <div class="container">
+      <p class="eyebrow" data-i18n="home.missionsEyebrow">NOS MISSIONS</p>
+      <h2 data-i18n="home.missionsTitle"></h2>
+      <p data-i18n="home.missionsText"></p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-header">
+        <p class="eyebrow" data-i18n="home.servicesEyebrow">NOS SERVICES</p>
+        <h2 data-i18n="home.servicesTitle"></h2>
+        <p data-i18n="home.servicesIntro"></p>
+      </div>
+      <div class="card-grid">
+        <div class="service-card">
+          <img src="/img/services/land.png" alt="Achat et vente de terrains">
+          <div class="card-body"><h3 data-i18n="services.service1Title"></h3><p data-i18n="services.service1Text"></p></div>
+        </div>
+        <div class="service-card">
+          <img src="/img/brand/divider-plots.png" alt="Morcellement">
+          <div class="card-body"><h3 data-i18n="services.service2Title"></h3><p data-i18n="services.service2Text"></p></div>
+        </div>
+        <div class="service-card">
+          <img src="/img/services/construction.png" alt="Construction">
+          <div class="card-body"><h3 data-i18n="services.service3Title"></h3><p data-i18n="services.service3Text"></p></div>
+        </div>
+        <div class="service-card">
+          <img src="/img/services/investment.png" alt="Investissement expatriés">
+          <div class="card-body"><h3 data-i18n="services.service4Title"></h3><p data-i18n="services.service4Text"></p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-alt">
+    <div class="container">
+      <div class="section-header">
+        <p class="eyebrow" data-i18n="home.featuredEyebrow"></p>
+        <h2 data-i18n="home.featuredTitle"></h2>
+        <p data-i18n="home.featuredIntro"></p>
+      </div>
+      <div class="card-grid" id="featured-properties"></div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-header">
+        <p class="eyebrow" data-i18n="home.testimonialsEyebrow"></p>
+        <h2 data-i18n="home.testimonialsTitle"></h2>
+      </div>
+      <div class="card-grid">
+        <div class="testimonial-card"><p data-i18n="home.testimonial1Quote"></p><strong data-i18n="home.testimonial1Name"></strong></div>
+        <div class="testimonial-card"><p data-i18n="home.testimonial2Quote"></p><strong data-i18n="home.testimonial2Name"></strong></div>
+      </div>
+      <div class="stats-band" style="margin-top:2.5rem;">
+        <div class="stat"><div class="stat-number" data-i18n="home.statSatisfiedNumber"></div><p data-i18n="home.statSatisfiedLabel"></p></div>
+        <div class="stat"><div class="stat-number" data-i18n="home.statOnTimeNumber"></div><p data-i18n="home.statOnTimeLabel"></p></div>
+        <div class="stat"><div class="stat-number" data-i18n="home.statReferralNumber"></div><p data-i18n="home.statReferralLabel"></p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-alt" style="text-align:center;">
+    <div class="container">
+      <h2 data-i18n="home.contactCtaTitle"></h2>
+      <p data-i18n="home.contactCtaIntro"></p>
+      <a class="btn btn-primary" href="/contact.html" data-i18n="home.contactCtaButton"></a>
+    </div>
+  </section>
+
+  <footer class="site-footer" id="site-footer"></footer>
+
+  <script src="/js/i18n.js"></script>
+  <script src="/js/partials.js"></script>
+  <script src="/js/home.js"></script>
+  <script>document.addEventListener('DOMContentLoaded', () => window.EfieldPartials.init());</script>
+</body>
 </html>
