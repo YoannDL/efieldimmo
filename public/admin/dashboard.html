@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tableau de bord — EFIELD IMMO</title>
+  <link rel="icon" href="/favicon.png">
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body class="admin-body">
+  <div class="container admin-shell">
+    <div class="admin-topbar">
+      <img src="/img/brand/logo.png" alt="EFIELD IMMO" style="height:44px;">
+      <div>
+        <span id="admin-username"></span>
+        <button type="button" class="btn btn-outline-dark" id="logout-btn">Déconnexion</button>
+      </div>
+    </div>
+
+    <div class="tab-buttons">
+      <button type="button" data-tab="properties" class="active">Biens</button>
+      <button type="button" data-tab="inquiries">Messages</button>
+    </div>
+
+    <div class="tab-panel" id="tab-properties">
+      <button type="button" class="btn btn-primary" id="new-property-btn">+ Ajouter un bien</button>
+      <table class="admin-table">
+        <thead><tr><th>Titre</th><th>Statut</th><th>Lieu</th><th>Prix</th><th>Vedette</th><th></th></tr></thead>
+        <tbody id="properties-tbody"></tbody>
+      </table>
+
+      <div id="property-form-section" hidden>
+        <h2 id="property-form-title">Nouveau bien</h2>
+        <form id="property-form">
+          <div class="property-form-grid">
+            <div class="form-field"><label>Statut</label>
+              <select name="status"><option value="sale">Vente</option><option value="rent">Location</option><option value="invest">Investissement</option></select>
+            </div>
+            <div class="form-field"><label>Type</label>
+              <select name="type">
+                <option value="residential-land">Terrain</option>
+                <option value="residential-villa">Villa</option>
+                <option value="residential-subdivision">Morcellement</option>
+                <option value="commercial-office">Bureau</option>
+              </select>
+            </div>
+            <div class="form-field"><label>Titre (FR)</label><input type="text" name="title_fr" required></div>
+            <div class="form-field"><label>Titre (EN)</label><input type="text" name="title_en" required></div>
+            <div class="form-field"><label>Localisation</label><input type="text" name="location" required></div>
+            <div class="form-field"><label>Prix (MUR)</label><input type="number" name="price" required></div>
+            <div class="form-field"><label>Chambres</label><input type="number" name="bedrooms" value="0"></div>
+            <div class="form-field"><label>Garages</label><input type="number" name="garages" value="0"></div>
+            <div class="form-field"><label>Parking</label><input type="number" name="parking" value="0"></div>
+            <div class="form-field"><label>Superficie terrain (m²)</label><input type="number" name="land_area_m2"></div>
+            <div class="form-field"><label>Superficie au sol (m²)</label><input type="number" name="floor_area_m2"></div>
+            <div class="form-field"><label><input type="checkbox" name="featured"> En vedette</label></div>
+          </div>
+          <div class="form-field"><label>Description (FR)</label><textarea name="description_fr" rows="3" required></textarea></div>
+          <div class="form-field"><label>Description (EN)</label><textarea name="description_en" rows="3" required></textarea></div>
+          <button type="submit" class="btn btn-primary">Enregistrer</button>
+          <button type="button" class="btn btn-outline-dark" id="cancel-property-btn">Annuler</button>
+        </form>
+
+        <div id="image-upload-section" hidden>
+          <h3>Photos</h3>
+          <div class="image-thumb-row" id="image-thumb-row"></div>
+          <input type="file" id="image-file-input" multiple accept="image/*">
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-panel" id="tab-inquiries" hidden>
+      <table class="admin-table">
+        <thead><tr><th>Date</th><th>Nom</th><th>Email</th><th>Téléphone</th><th>Bien</th><th>Message</th></tr></thead>
+        <tbody id="inquiries-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script src="/js/admin.js"></script>
+</body>
+</html>
