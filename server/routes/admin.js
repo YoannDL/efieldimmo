@@ -88,7 +88,11 @@ function createAdminRouter(db) {
   });
 
   router.delete('/properties/:id', (req, res) => {
+    const images = db.prepare('SELECT url FROM property_images WHERE property_id = ?').all(req.params.id);
     db.prepare('DELETE FROM properties WHERE id = ?').run(req.params.id);
+    for (const image of images) {
+      fs.rmSync(path.join(UPLOAD_DIR, path.basename(image.url)), { force: true });
+    }
     res.json({ ok: true });
   });
 
@@ -112,7 +116,7 @@ function createAdminRouter(db) {
     if (!image) return res.status(404).json({ error: 'Not found' });
     db.prepare('DELETE FROM property_images WHERE id = ?').run(req.params.imageId);
     const filePath = path.join(UPLOAD_DIR, path.basename(image.url));
-    fs.rm(filePath, { force: true }, () => {});
+    fs.rmSync(filePath, { force: true });
     res.json({ ok: true });
   });
 

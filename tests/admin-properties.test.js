@@ -90,3 +90,24 @@ test('uploads images for a property and can delete one', async () => {
     assert.equal(detail.images.length, 0);
   } finally { await close(); }
 });
+
+test('deleting a property also removes its uploaded image files from disk', async () => {
+  const { baseUrl, db, close } = startTestApp();
+  try {
+    const cookie = await loginCookie(baseUrl, db);
+    const created = await (await fetch(`${baseUrl}/admin/api/properties`, {
+      method: 'POST', headers: { cookie, 'content-type': 'application/json' }, body: JSON.stringify(samplePayload)
+    })).json();
+
+    const form = new FormData();
+    form.append('images', new Blob([Buffer.from('fake-image-bytes')], { type: 'image/jpeg' }), 'photo1.jpg');
+    const images = await (await fetch(`${baseUrl}/admin/api/properties/${created.id}/images`, {
+      method: 'POST', headers: { cookie }, body: form
+    })).json();
+    const filePath = path.join(__dirname, '..', 'public', images[0].url);
+    assert.ok(fs.existsSync(filePath));
+
+    await fetch(`${baseUrl}/admin/api/properties/${created.id}`, { method: 'DELETE', headers: { cookie } });
+    assert.equal(fs.existsSync(filePath), false);
+  } finally { await close(); }
+});
