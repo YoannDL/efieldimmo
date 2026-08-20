@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Détail du bien — EFIELD IMMO</title>
+  <link rel="icon" href="/favicon.png">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <header class="site-header" id="site-header"></header>
+
+  <section class="section">
+    <div class="container">
+      <h1 id="property-title"></h1>
+      <div style="display:grid;grid-template-columns:2fr 1fr;gap:2rem;">
+        <div>
+          <img id="gallery-main" class="gallery-main" src="" alt="">
+          <div class="gallery-thumbs" id="gallery-thumbs"></div>
+
+          <h2 data-i18n="propertyDetail.characteristicsTitle" style="margin-top:2rem;"></h2>
+          <div class="characteristics-grid" id="characteristics"></div>
+
+          <h2 data-i18n="propertyDetail.descriptionTitle"></h2>
+          <p id="property-description"></p>
+        </div>
+
+        <div>
+          <h2 data-i18n="propertyDetail.contactFormTitle"></h2>
+          <form id="inquiry-form">
+            <div class="form-field"><label data-i18n="propertyDetail.refLabel"></label><input type="text" id="refDisplay" name="propertyRef" disabled></div>
+            <div class="form-field"><label data-i18n="propertyDetail.nameLabel"></label><input type="text" name="name" required></div>
+            <div class="form-field"><label data-i18n="propertyDetail.emailLabel"></label><input type="email" name="email" required></div>
+            <div class="form-field"><label data-i18n="propertyDetail.phoneLabel"></label><input type="tel" name="phone"></div>
+            <div class="form-field">
+              <label data-i18n="propertyDetail.hasPropertyLabel"></label>
+              <select name="hasPropertyToSell">
+                <option value="yes" data-i18n="propertyDetail.yesLabel"></option>
+                <option value="no" data-i18n="propertyDetail.noLabel" selected></option>
+              </select>
+            </div>
+            <div class="form-field"><label data-i18n="propertyDetail.messageLabel"></label><textarea name="message" rows="4" required></textarea></div>
+            <button type="submit" class="btn btn-primary" data-i18n="propertyDetail.sendButton"></button>
+            <p class="form-success" id="form-success" hidden data-i18n="propertyDetail.successMessage"></p>
+            <p class="form-error" id="form-error" hidden data-i18n="propertyDetail.errorMessage"></p>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="site-footer" id="site-footer"></footer>
+
+  <script src="/js/i18n.js"></script>
+  <script src="/js/partials.js"></script>
+  <script src="/js/property-detail.js"></script>
+  <script>document.addEventListener('DOMContentLoaded', () => window.EfieldPartials.init());</script>
+</body>
+</html>
