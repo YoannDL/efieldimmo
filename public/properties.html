@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Nos biens — EFIELD IMMO</title>
+  <link rel="icon" href="/favicon.png">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <header class="site-header" id="site-header"></header>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-header">
+        <h1 data-i18n="propertiesPage.title">Nos Biens</h1>
+        <p data-i18n="propertiesPage.intro"></p>
+      </div>
+
+      <form class="search-bar" id="search-form">
+        <div>
+          <label for="status" data-i18n="propertiesPage.statusLabel">Statut</label>
+          <select id="status" name="status">
+            <option value="" data-i18n="propertiesPage.statusAll">Tous</option>
+            <option value="sale" data-i18n="propertiesPage.statusSale">Acheter</option>
+            <option value="rent" data-i18n="propertiesPage.statusRent">Louer</option>
+            <option value="invest" data-i18n="propertiesPage.statusInvest">Investissement</option>
+          </select>
+        </div>
+        <div>
+          <label for="type" data-i18n="propertiesPage.typeLabel">Type</label>
+          <select id="type" name="type">
+            <option value="" data-i18n="propertiesPage.typeAll">Tous types de biens immobiliers</option>
+            <option value="residential-land" data-i18n="propertiesPage.typeLand">Terrain</option>
+            <option value="residential-villa" data-i18n="propertiesPage.typeVilla">Villa</option>
+            <option value="residential-subdivision" data-i18n="propertiesPage.typeSubdivision">Morcellement</option>
+            <option value="commercial-office" data-i18n="propertiesPage.typeOffice">Bureau</option>
+          </select>
+        </div>
+        <div>
+          <label for="location" data-i18n="propertiesPage.locationLabel">Localisation</label>
+          <input type="text" id="location" name="location" data-i18n-placeholder="propertiesPage.locationPlaceholder">
+        </div>
+        <button type="submit" class="btn btn-primary" data-i18n="propertiesPage.searchButton">Recherche</button>
+        <button type="button" class="search-toggle" id="toggle-advanced" data-i18n="propertiesPage.refineButton">Affiner la recherche</button>
+
+        <div class="search-advanced" id="advanced-fields" hidden>
+          <div><label for="minPrice" data-i18n="propertiesPage.priceMinLabel"></label><input type="number" id="minPrice" name="minPrice"></div>
+          <div><label for="maxPrice" data-i18n="propertiesPage.priceMaxLabel"></label><input type="number" id="maxPrice" name="maxPrice"></div>
+          <div><label for="bedrooms" data-i18n="propertiesPage.bedroomsLabel"></label><input type="number" id="bedrooms" name="bedrooms" min="0"></div>
+          <div><label for="garages" data-i18n="propertiesPage.garagesLabel"></label><input type="number" id="garages" name="garages" min="0"></div>
+          <div><label for="parking" data-i18n="propertiesPage.parkingLabel"></label><input type="number" id="parking" name="parking" min="0"></div>
+          <div><label for="minLandArea" data-i18n="propertiesPage.landAreaLabel"></label><input type="number" id="minLandArea" name="minLandArea"></div>
+          <div><label for="minFloorArea" data-i18n="propertiesPage.floorAreaLabel"></label><input type="number" id="minFloorArea" name="minFloorArea"></div>
+        </div>
+      </form>
+
+      <p id="no-results" data-i18n="propertiesPage.noResults" hidden></p>
+      <div class="card-grid" id="properties-grid" style="margin-top:2rem;"></div>
+    </div>
+  </section>
+
+  <footer class="site-footer" id="site-footer"></footer>
+
+  <script src="/js/i18n.js"></script>
+  <script src="/js/partials.js"></script>
+  <script src="/js/properties.js"></script>
+  <script>document.addEventListener('DOMContentLoaded', () => window.EfieldPartials.init());</script>
+</body>
+</html>
