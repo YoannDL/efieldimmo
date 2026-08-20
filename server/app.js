@@ -2,6 +2,7 @@ const path = require('node:path');
 const express = require('express');
 const session = require('express-session');
 const { createDb } = require('./db');
+const { createAdminRouter } = require('./routes/admin');
 
 function createApp({ dbPath, sessionSecret }) {
   const db = createDb(dbPath);
@@ -16,6 +17,8 @@ function createApp({ dbPath, sessionSecret }) {
   }));
 
   app.use(express.static(path.join(__dirname, '..', 'public')));
+
+  app.use('/admin/api', createAdminRouter(db));
 
   return { app, db };
 }
