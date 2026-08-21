@@ -124,6 +124,10 @@ function createAdminRouter(db) {
     res.json(db.prepare('SELECT * FROM inquiries ORDER BY created_at DESC').all());
   });
 
+  router.get('/types', (req, res) => {
+    res.json(db.prepare('SELECT * FROM property_types ORDER BY label_fr').all());
+  });
+
   router.post('/types', (req, res) => {
     const { label_fr, label_en } = req.body || {};
     if (!label_fr || !label_en) {

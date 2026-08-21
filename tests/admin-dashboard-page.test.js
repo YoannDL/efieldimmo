@@ -10,6 +10,8 @@ test('admin dashboard page has the expected structure', async () => {
     assert.match(html, /id="property-form"/);
     assert.match(html, /id="image-upload-section"/);
     assert.match(html, /id="inquiries-tbody"/);
+    assert.match(html, /id="types-tbody"/);
+    assert.match(html, /id="type-form"/);
     assert.match(html, /id="logout-btn"/);
     assert.match(html, /src="\/js\/admin\.js"/);
   } finally {

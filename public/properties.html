@@ -31,15 +31,12 @@
           <label for="type" data-i18n="propertiesPage.typeLabel">Type</label>
           <select id="type" name="type">
             <option value="" data-i18n="propertiesPage.typeAll">Tous types de biens immobiliers</option>
-            <option value="residential-land" data-i18n="propertiesPage.typeLand">Terrain</option>
-            <option value="residential-villa" data-i18n="propertiesPage.typeVilla">Villa</option>
-            <option value="residential-subdivision" data-i18n="propertiesPage.typeSubdivision">Morcellement</option>
-            <option value="commercial-office" data-i18n="propertiesPage.typeOffice">Bureau</option>
           </select>
         </div>
         <div>
           <label for="location" data-i18n="propertiesPage.locationLabel">Localisation</label>
-          <input type="text" id="location" name="location" data-i18n-placeholder="propertiesPage.locationPlaceholder">
+          <input type="text" id="location" name="location" list="location-suggestions" data-i18n-placeholder="propertiesPage.locationPlaceholder">
+          <datalist id="location-suggestions"></datalist>
         </div>
         <button type="submit" class="btn btn-primary" data-i18n="propertiesPage.searchButton">Recherche</button>
         <button type="button" class="search-toggle" id="toggle-advanced" data-i18n="propertiesPage.refineButton">Affiner la recherche</button>
@@ -59,6 +56,46 @@
       <div class="card-grid" id="properties-grid" style="margin-top:2rem;"></div>
     </div>
   </section>
+
+  <div class="modal-overlay" id="property-modal" hidden>
+    <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <button type="button" class="modal-close" id="modal-close" aria-label="Fermer">&times;</button>
+      <h2 id="modal-title"></h2>
+      <div class="two-col modal-body">
+        <div>
+          <img id="modal-gallery-main" class="gallery-main" src="" alt="">
+          <div class="gallery-thumbs" id="modal-gallery-thumbs"></div>
+
+          <h3 data-i18n="propertyDetail.characteristicsTitle" style="margin-top:1.5rem;"></h3>
+          <div class="characteristics-grid" id="modal-characteristics"></div>
+
+          <h3 data-i18n="propertyDetail.descriptionTitle"></h3>
+          <p id="modal-description"></p>
+        </div>
+
+        <div>
+          <h3 data-i18n="propertyDetail.contactFormTitle"></h3>
+          <form id="modal-inquiry-form">
+            <div class="form-field"><label data-i18n="propertyDetail.refLabel"></label><input type="text" id="modal-ref" disabled></div>
+            <div class="form-field"><label data-i18n="propertyDetail.nameLabel"></label><input type="text" name="name" required></div>
+            <div class="form-field"><label data-i18n="propertyDetail.emailLabel"></label><input type="email" name="email" required></div>
+            <div class="form-field"><label data-i18n="propertyDetail.phoneLabel"></label><input type="tel" name="phone"></div>
+            <div class="form-field">
+              <label data-i18n="propertyDetail.hasPropertyLabel"></label>
+              <select name="hasPropertyToSell">
+                <option value="yes" data-i18n="propertyDetail.yesLabel"></option>
+                <option value="no" data-i18n="propertyDetail.noLabel" selected></option>
+              </select>
+            </div>
+            <div class="form-field"><label data-i18n="propertyDetail.messageLabel"></label><textarea name="message" rows="4" required></textarea></div>
+            <button type="submit" class="btn btn-primary" data-i18n="propertyDetail.sendButton"></button>
+            <p class="form-success" id="modal-form-success" hidden data-i18n="propertyDetail.successMessage"></p>
+            <p class="form-error" id="modal-form-error" hidden data-i18n="propertyDetail.errorMessage"></p>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <footer class="site-footer" id="site-footer"></footer>
 

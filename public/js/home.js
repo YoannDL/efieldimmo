@@ -20,7 +20,7 @@
     if (!container) return;
     const lang = currentLang();
     container.innerHTML = properties.slice(0, 3).map((p) => `
-      <a class="property-card" href="/property.html?id=${p.id}">
+      <a class="property-card" href="/properties.html?open=${p.id}">
         <img src="${p.primaryImage || '/img/brand/hero-home.png'}" alt="${lang === 'en' ? p.title_en : p.title_fr}">
         <div class="card-body">
           <span class="badge-featured" data-i18n="propertiesPage.featuredBadge"></span>

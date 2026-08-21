@@ -10,7 +10,7 @@ test('about page has the expected structure', async () => {
     assert.match(html, /id="site-footer"/);
     assert.match(html, /data-i18n="about.title"/);
     assert.match(html, /data-i18n="about.diff4Title"/);
-    assert.match(html, /data-i18n="about.expatBullet5"/);
+    assert.doesNotMatch(html, /about.expat/);
   } finally {
     await close();
   }

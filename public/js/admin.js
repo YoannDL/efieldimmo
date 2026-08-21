@@ -164,10 +164,74 @@
       btn.addEventListener('click', () => {
         buttons.forEach((b) => b.classList.remove('active'));
         btn.classList.add('active');
-        document.getElementById('tab-properties').hidden = btn.getAttribute('data-tab') !== 'properties';
-        document.getElementById('tab-inquiries').hidden = btn.getAttribute('data-tab') !== 'inquiries';
-        if (btn.getAttribute('data-tab') === 'inquiries') loadInquiries();
+        const tab = btn.getAttribute('data-tab');
+        document.querySelectorAll('.tab-panel').forEach((panel) => {
+          panel.hidden = panel.id !== `tab-${tab}`;
+        });
+        if (tab === 'inquiries') loadInquiries();
+        if (tab === 'types') loadTypes();
       });
+    });
+  }
+
+  /* ---------- Property type categories ---------- */
+
+  let allTypes = [];
+
+  function renderPropertyTypeSelect() {
+    const select = document.getElementById('property-type-select');
+    if (!select) return;
+    const selected = select.value;
+    select.innerHTML = allTypes.map((t) => `<option value="${t.value}">${t.label_fr}</option>`).join('');
+    if (selected && allTypes.some((t) => t.value === selected)) select.value = selected;
+  }
+
+  function renderTypesTable() {
+    const tbody = document.getElementById('types-tbody');
+    if (!tbody) return;
+    tbody.innerHTML = allTypes.map((t) => `
+      <tr>
+        <td>${t.label_fr}</td>
+        <td>${t.label_en}</td>
+        <td>${t.value}</td>
+        <td><button type="button" data-delete-type="${t.id}">Supprimer</button></td>
+      </tr>
+    `).join('');
+    tbody.querySelectorAll('[data-delete-type]').forEach((btn) => {
+      btn.addEventListener('click', async () => {
+        if (!window.confirm('Supprimer cette catégorie ? Les biens existants de ce type ne seront pas modifiés.')) return;
+        await api(`/admin/api/types/${btn.getAttribute('data-delete-type')}`, { method: 'DELETE' });
+        await loadTypes();
+      });
+    });
+  }
+
+  async function loadTypes() {
+    const res = await api('/admin/api/types');
+    allTypes = await res.json();
+    renderTypesTable();
+    renderPropertyTypeSelect();
+  }
+
+  function wireTypeForm() {
+    const form = document.getElementById('type-form');
+    if (!form) return;
+    const errorEl = document.getElementById('type-error');
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      errorEl.hidden = true;
+      const data = Object.fromEntries(new FormData(form).entries());
+      const res = await api('/admin/api/types', {
+        method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(data)
+      });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        errorEl.textContent = body.error || 'Erreur lors de l\'ajout.';
+        errorEl.hidden = false;
+        return;
+      }
+      form.reset();
+      await loadTypes();
     });
   }
 
@@ -192,7 +256,9 @@
     usernameEl.textContent = session.username;
     wireTabs();
     wirePropertyForm();
+    wireTypeForm();
     wireLogout();
+    await loadTypes();
     await loadProperties();
   }
 
