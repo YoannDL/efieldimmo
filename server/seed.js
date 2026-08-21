@@ -30,8 +30,22 @@ const SAMPLE_PROPERTIES = [
   }
 ];
 
+const DEFAULT_TYPES = [
+  { value: 'residential-land', label_fr: 'Terrain', label_en: 'Land' },
+  { value: 'residential-studio', label_fr: 'Studio', label_en: 'Studio' },
+  { value: 'residential-house', label_fr: 'Maison', label_en: 'House' },
+  { value: 'residential-townhouse', label_fr: 'Maison de ville', label_en: 'Townhouse' },
+  { value: 'residential-villa', label_fr: 'Villa', label_en: 'Villa' },
+  { value: 'residential-apartment', label_fr: 'Appartement', label_en: 'Apartment' },
+  { value: 'residential-subdivision', label_fr: 'Morcellement', label_en: 'Subdivision' },
+  { value: 'commercial-office', label_fr: 'Bureau', label_en: 'Office' }
+];
+
 function seedDatabase(db, { adminUsername, adminPassword }) {
   upsertAdminUser(db, adminUsername, bcrypt.hashSync(adminPassword, 10));
+
+  const insertType = db.prepare('INSERT OR IGNORE INTO property_types (value, label_fr, label_en) VALUES (@value, @label_fr, @label_en)');
+  for (const type of DEFAULT_TYPES) insertType.run(type);
 
   const { count } = db.prepare('SELECT COUNT(*) AS count FROM properties').get();
   if (count > 0) return { propertiesInserted: 0 };

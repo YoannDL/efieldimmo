@@ -25,6 +25,10 @@ test('seedDatabase inserts the admin user and 3 sample properties with images', 
 
   const images = db.prepare('SELECT * FROM property_images').all();
   assert.equal(images.length, 6);
+
+  const types = db.prepare('SELECT * FROM property_types').all();
+  assert.equal(types.length, 8);
+  assert.ok(types.some(t => t.value === 'residential-studio'));
 });
 
 test('seedDatabase is idempotent for properties on repeat runs', () => {

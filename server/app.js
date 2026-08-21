@@ -5,6 +5,7 @@ const { createDb } = require('./db');
 const { createAdminRouter } = require('./routes/admin');
 const { createPropertiesRouter } = require('./routes/properties');
 const { createInquiriesRouter } = require('./routes/inquiries');
+const { createFiltersRouter } = require('./routes/filters');
 
 function createApp({ dbPath, sessionSecret }) {
   const db = createDb(dbPath);
@@ -23,6 +24,7 @@ function createApp({ dbPath, sessionSecret }) {
   app.use('/admin/api', createAdminRouter(db));
   app.use('/api/properties', createPropertiesRouter(db));
   app.use('/api/inquiries', createInquiriesRouter(db));
+  app.use('/api/filters', createFiltersRouter(db));
 
   return { app, db };
 }

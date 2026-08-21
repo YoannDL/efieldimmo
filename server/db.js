@@ -34,6 +34,12 @@ function createDb(dbPath) {
       url TEXT NOT NULL,
       sort_order INTEGER NOT NULL DEFAULT 0
     );
+    CREATE TABLE IF NOT EXISTS property_types (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      value TEXT UNIQUE NOT NULL,
+      label_fr TEXT NOT NULL,
+      label_en TEXT NOT NULL
+    );
     CREATE TABLE IF NOT EXISTS inquiries (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT NOT NULL,

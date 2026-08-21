@@ -124,6 +124,24 @@ function createAdminRouter(db) {
     res.json(db.prepare('SELECT * FROM inquiries ORDER BY created_at DESC').all());
   });
 
+  router.post('/types', (req, res) => {
+    const { label_fr, label_en } = req.body || {};
+    if (!label_fr || !label_en) {
+      return res.status(400).json({ error: 'label_fr and label_en are required' });
+    }
+    const value = label_fr.normalize('NFD').replace(/[̀-ͯ]/g, '')
+      .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+    const existing = db.prepare('SELECT id FROM property_types WHERE value = ?').get(value);
+    if (existing) return res.status(409).json({ error: 'This type already exists' });
+    const info = db.prepare('INSERT INTO property_types (value, label_fr, label_en) VALUES (?, ?, ?)').run(value, label_fr, label_en);
+    res.status(201).json({ id: info.lastInsertRowid, value, label_fr, label_en });
+  });
+
+  router.delete('/types/:id', (req, res) => {
+    db.prepare('DELETE FROM property_types WHERE id = ?').run(req.params.id);
+    res.json({ ok: true });
+  });
+
   return router;
 }
 
