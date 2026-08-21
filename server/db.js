@@ -52,8 +52,25 @@ function createDb(dbPath) {
       message TEXT NOT NULL,
       created_at TEXT NOT NULL DEFAULT (datetime('now'))
     );
+    CREATE TABLE IF NOT EXISTS page_views (
+      path TEXT NOT NULL,
+      day TEXT NOT NULL,
+      views INTEGER NOT NULL DEFAULT 0,
+      PRIMARY KEY (path, day)
+    );
   `);
+  ensureColumn(db, 'properties', 'availability', "availability TEXT NOT NULL DEFAULT 'available'");
+  ensureColumn(db, 'properties', 'featured_order', 'featured_order INTEGER NOT NULL DEFAULT 0');
+  ensureColumn(db, 'properties', 'map_url', 'map_url TEXT');
+  ensureColumn(db, 'inquiries', 'status', "status TEXT NOT NULL DEFAULT 'new'");
   return db;
+}
+
+function ensureColumn(db, table, column, ddl) {
+  const columns = db.prepare(`PRAGMA table_info(${table})`).all().map((c) => c.name);
+  if (!columns.includes(column)) {
+    db.exec(`ALTER TABLE ${table} ADD COLUMN ${ddl}`);
+  }
 }
 
 function upsertAdminUser(db, username, passwordHash) {

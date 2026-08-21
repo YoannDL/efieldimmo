@@ -6,6 +6,8 @@ const { createAdminRouter } = require('./routes/admin');
 const { createPropertiesRouter } = require('./routes/properties');
 const { createInquiriesRouter } = require('./routes/inquiries');
 const { createFiltersRouter } = require('./routes/filters');
+const { createTrackRouter } = require('./routes/track');
+const { createNotifier } = require('./notify');
 
 function createApp({ dbPath, sessionSecret }) {
   const db = createDb(dbPath);
@@ -23,8 +25,9 @@ function createApp({ dbPath, sessionSecret }) {
 
   app.use('/admin/api', createAdminRouter(db));
   app.use('/api/properties', createPropertiesRouter(db));
-  app.use('/api/inquiries', createInquiriesRouter(db));
+  app.use('/api/inquiries', createInquiriesRouter(db, createNotifier()));
   app.use('/api/filters', createFiltersRouter(db));
+  app.use('/api/track', createTrackRouter(db));
 
   return { app, db };
 }

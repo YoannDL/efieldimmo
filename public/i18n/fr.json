@@ -71,7 +71,8 @@
     "refineButton": "Affiner la recherche", "searchButton": "Recherche",
     "priceMinLabel": "Prix minimum", "priceMaxLabel": "Prix maximum", "bedroomsLabel": "Chambres", "garagesLabel": "Garages",
     "parkingLabel": "Parking", "landAreaLabel": "Superficie terrain (m²)", "floorAreaLabel": "Superficie au sol (m²)",
-    "noResults": "Aucun bien ne correspond à votre recherche pour le moment.", "viewDetails": "Voir le détail", "featuredBadge": "En vedette"
+    "noResults": "Aucun bien ne correspond à votre recherche pour le moment.", "viewDetails": "Voir le détail", "featuredBadge": "En vedette",
+    "badgeNew": "Nouveauté", "badgeReserved": "Réservé", "badgeSold": "Vendu"
   },
   "propertyDetail": {
     "characteristicsTitle": "Caractéristiques", "descriptionTitle": "Description",
@@ -81,7 +82,9 @@
     "emailLabel": "Email", "phoneLabel": "Numéro de téléphone", "hasPropertyLabel": "Avez-vous un bien à vendre ?",
     "yesLabel": "Oui", "noLabel": "Non", "messageLabel": "Message", "sendButton": "Envoyer",
     "successMessage": "Merci, votre message a bien été envoyé. Nous vous répondrons sous 24h ouvrées.",
-    "errorMessage": "Une erreur est survenue, veuillez réessayer."
+    "errorMessage": "Une erreur est survenue, veuillez réessayer.",
+    "printButton": "Imprimer / PDF", "mapTitle": "Emplacement",
+    "whatsappMessage": "Bonjour, je suis intéressé(e) par le bien #{id} – {title}"
   },
   "contact": {
     "eyebrow": "CONTACTEZ-NOUS", "title": "Contactez-nous",

@@ -1,6 +1,6 @@
 const express = require('express');
 
-function createInquiriesRouter(db) {
+function createInquiriesRouter(db, notifier) {
   const router = express.Router();
 
   router.post('/', (req, res) => {
@@ -19,6 +19,10 @@ function createInquiriesRouter(db) {
       project_type: projectType || null,
       budget_range: budgetRange || null
     });
+    if (notifier) {
+      notifier.sendInquiryNotification({ name, email, message, phone, propertyRef, hasPropertyToSell, projectType, budgetRange })
+        .catch(() => {});
+    }
     res.status(201).json({ id: info.lastInsertRowid });
   });
 

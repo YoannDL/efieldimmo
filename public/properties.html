@@ -4,6 +4,11 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Nos biens — EFIELD IMMO</title>
+  <meta name="description" content="Recherchez parmi nos terrains, villas et projets immobiliers disponibles à l'île Maurice.">
+  <meta property="og:title" content="Nos biens — EFIELD IMMO">
+  <meta property="og:description" content="Recherchez parmi nos terrains, villas et projets immobiliers disponibles à l'île Maurice.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="/img/brand/hero-home.png">
   <link rel="icon" href="/favicon.png">
   <link rel="stylesheet" href="/css/styles.css">
 </head>
@@ -61,6 +66,7 @@
     <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="modal-title">
       <button type="button" class="modal-close" id="modal-close" aria-label="Fermer">&times;</button>
       <h2 id="modal-title"></h2>
+      <p id="modal-badges"></p>
       <div class="two-col modal-body">
         <div>
           <img id="modal-gallery-main" class="gallery-main" src="" alt="">
@@ -71,9 +77,16 @@
 
           <h3 data-i18n="propertyDetail.descriptionTitle"></h3>
           <p id="modal-description"></p>
+
+          <h3 data-i18n="propertyDetail.mapTitle"></h3>
+          <div class="modal-map-wrap">
+            <iframe id="modal-map" title="Carte" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+          </div>
+
+          <button type="button" class="btn btn-outline-dark" id="modal-print" data-i18n="propertyDetail.printButton" style="margin-top:1rem;"></button>
         </div>
 
-        <div>
+        <div class="modal-form-col">
           <h3 data-i18n="propertyDetail.contactFormTitle"></h3>
           <form id="modal-inquiry-form">
             <div class="form-field"><label data-i18n="propertyDetail.refLabel"></label><input type="text" id="modal-ref" disabled></div>

@@ -14,6 +14,9 @@ test('properties page has the expected search form and grid', async () => {
     assert.match(html, /id="property-modal"/);
     assert.match(html, /id="modal-inquiry-form"/);
     assert.match(html, /id="location-suggestions"/);
+    assert.match(html, /id="modal-map"/);
+    assert.match(html, /id="modal-print"/);
+    assert.match(html, /meta name="description"/);
     assert.doesNotMatch(html, /option value="residential-land"/);
   } finally {
     await close();

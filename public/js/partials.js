@@ -37,6 +37,11 @@
       ]);
       highlightActiveNavLink();
       wireMobileNavToggle();
+      fetch('/api/track', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ path: window.location.pathname === '/' ? '/index.html' : window.location.pathname })
+      }).catch(() => {});
       await window.EfieldI18n.init();
     }
   };

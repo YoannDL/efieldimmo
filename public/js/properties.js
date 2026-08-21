@@ -16,6 +16,22 @@
   let availableTypes = [];
   let currentProperty = null;
 
+  const NEW_BADGE_DAYS = 30;
+
+  function isNew(property) {
+    if (!property.created_at) return false;
+    const created = new Date(property.created_at.replace(' ', 'T') + 'Z');
+    return (Date.now() - created.getTime()) < NEW_BADGE_DAYS * 24 * 60 * 60 * 1000;
+  }
+
+  function badgesHtml(property) {
+    const badges = [];
+    if (property.availability === 'sold') badges.push(`<span class="badge-sold">${t('propertiesPage.badgeSold')}</span>`);
+    else if (property.availability === 'reserved') badges.push(`<span class="badge-reserved">${t('propertiesPage.badgeReserved')}</span>`);
+    else if (isNew(property)) badges.push(`<span class="badge-new">${t('propertiesPage.badgeNew')}</span>`);
+    return badges.join(' ');
+  }
+
   /* ---------- Search filters (auto-populated from the admin-managed list) ---------- */
 
   function renderTypeOptions() {
@@ -58,9 +74,10 @@
     noResults.hidden = true;
     const bedroomsLabel = t('propertiesPage.bedroomsLabel');
     grid.innerHTML = properties.map((p) => `
-      <a class="property-card" href="/properties.html?open=${p.id}" data-property-id="${p.id}">
+      <a class="property-card${p.availability === 'sold' ? ' is-sold' : ''}" href="/properties.html?open=${p.id}" data-property-id="${p.id}">
         <img src="${p.primaryImage || '/img/brand/hero-home.png'}" alt="${lang === 'en' ? p.title_en : p.title_fr}">
         <div class="card-body">
+          ${badgesHtml(p)}
           <h3>${lang === 'en' ? p.title_en : p.title_fr}</h3>
           <p class="price">${formatPrice(p)}</p>
           <p class="meta">
@@ -108,10 +125,34 @@
 
   /* ---------- Property detail modal ---------- */
 
+  const WHATSAPP_BASE = 'https://wa.me/23057000000';
+
+  function updateWhatsAppLink(property) {
+    const button = document.querySelector('.whatsapp-button');
+    if (!button) return;
+    if (!property) {
+      button.setAttribute('href', WHATSAPP_BASE);
+      return;
+    }
+    const lang = currentLang();
+    const title = lang === 'en' ? property.title_en : property.title_fr;
+    const message = (t('propertyDetail.whatsappMessage') || 'Bonjour, bien #{id} – {title}')
+      .replace('{id}', property.id).replace('{title}', title);
+    button.setAttribute('href', `${WHATSAPP_BASE}?text=${encodeURIComponent(message)}`);
+  }
+
   function renderModal(property) {
     const lang = currentLang();
     document.getElementById('modal-title').textContent = lang === 'en' ? property.title_en : property.title_fr;
+    document.getElementById('modal-badges').innerHTML = badgesHtml(property);
     document.getElementById('modal-description').textContent = lang === 'en' ? property.description_en : property.description_fr;
+
+    const mapFrame = document.getElementById('modal-map');
+    mapFrame.src = property.map_url && property.map_url.includes('output=embed')
+      ? property.map_url
+      : `https://maps.google.com/maps?q=${encodeURIComponent((property.map_url && !property.map_url.startsWith('http') ? property.map_url : property.location) + ', Mauritius')}&output=embed`;
+
+    updateWhatsAppLink(property);
 
     const images = property.images.length ? property.images : [{ url: '/img/brand/hero-home.png' }];
     document.getElementById('modal-gallery-main').src = images[0].url;
@@ -143,17 +184,24 @@
     document.getElementById('modal-form-error').hidden = true;
     document.getElementById('property-modal').hidden = false;
     document.body.classList.add('modal-open');
+    fetch('/api/track', {
+      method: 'POST', headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ path: `property:${currentProperty.id}` })
+    }).catch(() => {});
   }
 
   function closeModal() {
     document.getElementById('property-modal').hidden = true;
     document.body.classList.remove('modal-open');
+    document.getElementById('modal-map').src = 'about:blank';
+    updateWhatsAppLink(null);
     currentProperty = null;
   }
 
   function wireModal() {
     const overlay = document.getElementById('property-modal');
     document.getElementById('modal-close').addEventListener('click', closeModal);
+    document.getElementById('modal-print').addEventListener('click', () => window.print());
     overlay.addEventListener('click', (event) => {
       if (event.target === overlay) closeModal();
     });

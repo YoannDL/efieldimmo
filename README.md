@@ -15,6 +15,14 @@ cp .env.example .env
 Edit `.env` and set a real `SESSION_SECRET`, `ADMIN_USERNAME` and
 `ADMIN_PASSWORD` before running the seed script anywhere beyond local dev.
 
+Notes:
+- The project pins `ignore-scripts=true` in `.npmrc`: all dependencies ship
+  prebuilt binaries, so no compiler toolchain is ever needed. Use `npm`
+  (not pnpm/yarn) to keep the lockfile consistent.
+- Optional email notifications: fill in the `SMTP_*` and `NOTIFY_EMAIL`
+  variables in `.env` to receive an email for every inquiry. Left empty,
+  inquiries are still stored and visible in the admin panel.
+
 ## Seed the database
 
 ```bash
@@ -33,6 +41,19 @@ npm start
 
 Visit `http://localhost:3000` for the public site and
 `http://localhost:3000/admin/login.html` for the admin panel.
+
+## Feature highlights
+
+- Bilingual FR/EN with a header toggle; property search filters (type,
+  location suggestions) auto-populate from the admin-managed categories.
+- Clicking a property opens a modal with gallery, characteristics, map,
+  a Print/PDF button and an inquiry form pre-filled with the reference.
+- WhatsApp floating button; while a property is open the link is pre-filled
+  with a message referencing that property.
+- Admin panel: property CRUD (photos are auto-resized to max 1600px JPEG),
+  availability (available / reserved / sold shown as badges), featured
+  ordering, "Nouveauté" badge for listings under 30 days, category
+  management, inquiry follow-up statuses, and a 30-day view-count report.
 
 ## Tests
 

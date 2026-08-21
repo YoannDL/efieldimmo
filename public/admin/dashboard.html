@@ -22,6 +22,7 @@
       <button type="button" data-tab="properties" class="active">Biens</button>
       <button type="button" data-tab="types">Catégories</button>
       <button type="button" data-tab="inquiries">Messages</button>
+      <button type="button" data-tab="stats">Statistiques</button>
     </div>
 
     <div class="tab-panel" id="tab-properties">
@@ -52,7 +53,16 @@
             <div class="form-field"><label>Parking</label><input type="number" name="parking" value="0"></div>
             <div class="form-field"><label>Superficie terrain (m²)</label><input type="number" name="land_area_m2"></div>
             <div class="form-field"><label>Superficie au sol (m²)</label><input type="number" name="floor_area_m2"></div>
+            <div class="form-field"><label>Disponibilité</label>
+              <select name="availability">
+                <option value="available">Disponible</option>
+                <option value="reserved">Réservé</option>
+                <option value="sold">Vendu</option>
+              </select>
+            </div>
+            <div class="form-field"><label>Lieu précis pour la carte (optionnel)</label><input type="text" name="map_url" placeholder="ex : Royal Road, Grand Baie"></div>
             <div class="form-field"><label><input type="checkbox" name="featured"> En vedette</label></div>
+            <div class="form-field"><label>Ordre en vedette (1 = premier)</label><input type="number" name="featured_order" value="0" min="0"></div>
           </div>
           <div class="form-field"><label>Description (FR)</label><textarea name="description_fr" rows="3" required></textarea></div>
           <div class="form-field"><label>Description (EN)</label><textarea name="description_en" rows="3" required></textarea></div>
@@ -87,8 +97,18 @@
     <div class="tab-panel" id="tab-inquiries" hidden>
       <div class="table-scroll">
         <table class="admin-table">
-          <thead><tr><th>Date</th><th>Nom</th><th>Email</th><th>Téléphone</th><th>Bien</th><th>Message</th></tr></thead>
+          <thead><tr><th>Date</th><th>Nom</th><th>Email</th><th>Téléphone</th><th>Bien</th><th>Message</th><th>Suivi</th></tr></thead>
           <tbody id="inquiries-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="tab-panel" id="tab-stats" hidden>
+      <p>Vues des 30 derniers jours (pages du site et biens ouverts).</p>
+      <div class="table-scroll">
+        <table class="admin-table">
+          <thead><tr><th>Page / Bien</th><th>Vues</th></tr></thead>
+          <tbody id="stats-tbody"></tbody>
         </table>
       </div>
     </div>

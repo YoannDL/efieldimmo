@@ -137,6 +137,8 @@
     });
   }
 
+  const INQUIRY_STATUS_LABELS = { new: 'Nouveau', contacted: 'Contacté', closed: 'Clôturé' };
+
   function renderInquiriesTable(inquiries) {
     const tbody = document.getElementById('inquiries-tbody');
     if (!tbody) return;
@@ -148,13 +150,43 @@
         <td>${i.phone || ''}</td>
         <td>${i.property_ref || ''}</td>
         <td>${i.message}</td>
+        <td>
+          <select data-inquiry-status="${i.id}">
+            ${Object.entries(INQUIRY_STATUS_LABELS).map(([value, label]) =>
+              `<option value="${value}"${i.status === value ? ' selected' : ''}>${label}</option>`).join('')}
+          </select>
+        </td>
       </tr>
     `).join('');
+    tbody.querySelectorAll('[data-inquiry-status]').forEach((select) => {
+      select.addEventListener('change', async () => {
+        await api(`/admin/api/inquiries/${select.getAttribute('data-inquiry-status')}`, {
+          method: 'PUT', headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ status: select.value })
+        });
+      });
+    });
   }
 
   async function loadInquiries() {
     const res = await api('/admin/api/inquiries');
     renderInquiriesTable(await res.json());
+  }
+
+  async function loadStats() {
+    const res = await api('/admin/api/stats');
+    const rows = await res.json();
+    const tbody = document.getElementById('stats-tbody');
+    if (!tbody) return;
+    tbody.innerHTML = rows.map((r) => {
+      let label = r.path;
+      const propertyMatch = r.path.match(/^property:(\d+)$/);
+      if (propertyMatch) {
+        const property = allProperties.find((p) => p.id === Number(propertyMatch[1]));
+        label = property ? `Bien #${propertyMatch[1]} — ${property.title_fr}` : `Bien #${propertyMatch[1]} (supprimé)`;
+      }
+      return `<tr><td>${label}</td><td>${r.views}</td></tr>`;
+    }).join('');
   }
 
   function wireTabs() {
@@ -170,6 +202,7 @@
         });
         if (tab === 'inquiries') loadInquiries();
         if (tab === 'types') loadTypes();
+        if (tab === 'stats') loadStats();
       });
     });
   }

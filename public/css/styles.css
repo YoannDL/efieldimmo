@@ -65,6 +65,10 @@ p { margin: 0 0 1em; }
 .property-card .price { color: var(--color-gold); font-weight: 700; margin: 0.25em 0; }
 .property-card .meta { display: flex; gap: 1rem; color: var(--color-subtitle); font-size: 0.9rem; flex-wrap: wrap; }
 .badge-featured { display: inline-block; background: var(--color-gold); color: #fff; font-size: 0.7rem; font-weight: 700; padding: 0.25em 0.6em; border-radius: 3px; margin-bottom: 0.5em; }
+.badge-new { display: inline-block; background: var(--color-blue); color: #fff; font-size: 0.7rem; font-weight: 700; padding: 0.25em 0.6em; border-radius: 3px; margin-bottom: 0.5em; }
+.badge-reserved { display: inline-block; background: #b57f2a; color: #fff; font-size: 0.7rem; font-weight: 700; padding: 0.25em 0.6em; border-radius: 3px; margin-bottom: 0.5em; }
+.badge-sold { display: inline-block; background: #8a3b34; color: #fff; font-size: 0.7rem; font-weight: 700; padding: 0.25em 0.6em; border-radius: 3px; margin-bottom: 0.5em; }
+.property-card.is-sold img { filter: grayscale(0.7); }
 
 .search-bar { background: var(--color-subtitle); color: #fff; padding: 1.5rem; border-radius: 8px; display: flex; flex-wrap: wrap; gap: 1rem; align-items: flex-end; }
 .search-bar label { display: block; font-size: 0.8rem; margin-bottom: 0.3em; }
@@ -106,6 +110,19 @@ p { margin: 0 0 1em; }
 .modal-box .gallery-main { height: 320px; }
 .modal-close { position: sticky; top: 0; float: right; border: none; background: var(--color-cream); color: var(--color-subtitle); font-size: 1.5rem; line-height: 1; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; z-index: 1; }
 body.modal-open { overflow: hidden; }
+.modal-map-wrap { border-radius: 8px; overflow: hidden; }
+.modal-map-wrap iframe { width: 100%; height: 260px; border: 0; display: block; }
+
+/* Print: only the open property modal, as a clean property sheet */
+@media print {
+  body.modal-open > *:not(.modal-overlay):not(#property-modal) { display: none !important; }
+  body.modal-open { overflow: visible; }
+  .modal-overlay { position: static; padding: 0; background: none; display: block; }
+  .modal-box { max-width: none; max-height: none; overflow: visible; box-shadow: none; padding: 0; }
+  .modal-close, .modal-form-col, #modal-print, .whatsapp-button, .modal-map-wrap { display: none !important; }
+  .modal-box .two-col { grid-template-columns: 1fr; }
+  .gallery-thumbs img { height: 120px; }
+}
 @media (max-width: 768px) {
   .modal-overlay { padding: 0.5rem; }
   .modal-box { padding: 1.25rem; max-height: 95vh; }

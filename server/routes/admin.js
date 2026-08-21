@@ -4,24 +4,21 @@ const crypto = require('node:crypto');
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const multer = require('multer');
+const sharp = require('sharp');
 const { requireAdmin } = require('../middleware/auth');
 
 const UPLOAD_DIR = path.join(__dirname, '..', '..', 'public', 'img', 'properties');
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    fs.mkdirSync(UPLOAD_DIR, { recursive: true });
-    cb(null, UPLOAD_DIR);
-  },
-  filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname) || '.jpg';
-    cb(null, `${crypto.randomUUID()}${ext}`);
-  }
-});
-const upload = multer({ storage, limits: { fileSize: 8 * 1024 * 1024 } });
+// Uploads land in memory first so sharp can resize/compress before anything
+// touches the disk — real-estate photos are routinely 5-10MB straight off a phone.
+const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 20 * 1024 * 1024 } });
+
+const AVAILABILITY_VALUES = ['available', 'reserved', 'sold'];
+const INQUIRY_STATUSES = ['new', 'contacted', 'closed'];
 
 const PROPERTY_FIELDS = ['status', 'type', 'title_fr', 'title_en', 'description_fr', 'description_en',
-  'location', 'price', 'currency', 'bedrooms', 'garages', 'parking', 'land_area_m2', 'floor_area_m2', 'featured'];
+  'location', 'price', 'currency', 'bedrooms', 'garages', 'parking', 'land_area_m2', 'floor_area_m2',
+  'featured', 'availability', 'featured_order', 'map_url'];
 
 function pickPropertyFields(body) {
   const out = {};
@@ -32,10 +29,13 @@ function pickPropertyFields(body) {
   out.bedrooms = Number(out.bedrooms || 0);
   out.garages = Number(out.garages || 0);
   out.parking = Number(out.parking || 0);
-  out.land_area_m2 = out.land_area_m2 != null ? Number(out.land_area_m2) : null;
-  out.floor_area_m2 = out.floor_area_m2 != null ? Number(out.floor_area_m2) : null;
+  out.land_area_m2 = out.land_area_m2 != null && out.land_area_m2 !== '' ? Number(out.land_area_m2) : null;
+  out.floor_area_m2 = out.floor_area_m2 != null && out.floor_area_m2 !== '' ? Number(out.floor_area_m2) : null;
   out.featured = out.featured ? 1 : 0;
   out.price = Number(out.price);
+  out.availability = AVAILABILITY_VALUES.includes(out.availability) ? out.availability : 'available';
+  out.featured_order = Number(out.featured_order || 0);
+  out.map_url = out.map_url || null;
   return out;
 }
 
@@ -66,9 +66,11 @@ function createAdminRouter(db) {
     const fields = pickPropertyFields(req.body || {});
     const info = db.prepare(`
       INSERT INTO properties (status, type, title_fr, title_en, description_fr, description_en,
-        location, price, currency, bedrooms, garages, parking, land_area_m2, floor_area_m2, featured)
+        location, price, currency, bedrooms, garages, parking, land_area_m2, floor_area_m2, featured,
+        availability, featured_order, map_url)
       VALUES (@status, @type, @title_fr, @title_en, @description_fr, @description_en, @location,
-        @price, @currency, @bedrooms, @garages, @parking, @land_area_m2, @floor_area_m2, @featured)
+        @price, @currency, @bedrooms, @garages, @parking, @land_area_m2, @floor_area_m2, @featured,
+        @availability, @featured_order, @map_url)
     `).run(fields);
     res.status(201).json({ id: info.lastInsertRowid });
   });
@@ -81,7 +83,8 @@ function createAdminRouter(db) {
       UPDATE properties SET status=@status, type=@type, title_fr=@title_fr, title_en=@title_en,
         description_fr=@description_fr, description_en=@description_en, location=@location,
         price=@price, currency=@currency, bedrooms=@bedrooms, garages=@garages, parking=@parking,
-        land_area_m2=@land_area_m2, floor_area_m2=@floor_area_m2, featured=@featured
+        land_area_m2=@land_area_m2, floor_area_m2=@floor_area_m2, featured=@featured,
+        availability=@availability, featured_order=@featured_order, map_url=@map_url
       WHERE id=@id
     `).run({ ...fields, id: req.params.id });
     res.json({ id: Number(req.params.id) });
@@ -96,15 +99,33 @@ function createAdminRouter(db) {
     res.json({ ok: true });
   });
 
-  router.post('/properties/:id/images', upload.array('images', 10), (req, res) => {
+  router.post('/properties/:id/images', upload.array('images', 10), async (req, res) => {
     const property = db.prepare('SELECT id FROM properties WHERE id = ?').get(req.params.id);
     if (!property) return res.status(404).json({ error: 'Not found' });
+
+    fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+    const processed = [];
+    for (const file of req.files || []) {
+      const filename = `${crypto.randomUUID()}.jpg`;
+      try {
+        await sharp(file.buffer)
+          .rotate()
+          .resize({ width: 1600, withoutEnlargement: true })
+          .jpeg({ quality: 80 })
+          .toFile(path.join(UPLOAD_DIR, filename));
+      } catch (err) {
+        for (const p of processed) fs.rmSync(path.join(UPLOAD_DIR, p.filename), { force: true });
+        return res.status(400).json({ error: `Invalid image file: ${file.originalname}` });
+      }
+      processed.push({ filename });
+    }
+
     const insert = db.prepare('INSERT INTO property_images (property_id, url, sort_order) VALUES (?, ?, ?)');
     const maxOrderRow = db.prepare('SELECT COALESCE(MAX(sort_order), -1) AS m FROM property_images WHERE property_id = ?').get(req.params.id);
     let nextOrder = maxOrderRow.m + 1;
     const created = [];
-    for (const file of req.files || []) {
-      const url = `/img/properties/${file.filename}`;
+    for (const { filename } of processed) {
+      const url = `/img/properties/${filename}`;
       const info = insert.run(req.params.id, url, nextOrder++);
       created.push({ id: info.lastInsertRowid, url });
     }
@@ -122,6 +143,26 @@ function createAdminRouter(db) {
 
   router.get('/inquiries', (req, res) => {
     res.json(db.prepare('SELECT * FROM inquiries ORDER BY created_at DESC').all());
+  });
+
+  router.put('/inquiries/:id', (req, res) => {
+    const { status } = req.body || {};
+    if (!INQUIRY_STATUSES.includes(status)) {
+      return res.status(400).json({ error: `status must be one of: ${INQUIRY_STATUSES.join(', ')}` });
+    }
+    const existing = db.prepare('SELECT id FROM inquiries WHERE id = ?').get(req.params.id);
+    if (!existing) return res.status(404).json({ error: 'Not found' });
+    db.prepare('UPDATE inquiries SET status = ? WHERE id = ?').run(status, req.params.id);
+    res.json({ ok: true });
+  });
+
+  router.get('/stats', (req, res) => {
+    const rows = db.prepare(`
+      SELECT path, SUM(views) AS views FROM page_views
+      WHERE day >= date('now', '-30 days')
+      GROUP BY path ORDER BY views DESC
+    `).all();
+    res.json(rows);
   });
 
   router.get('/types', (req, res) => {

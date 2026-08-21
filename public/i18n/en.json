@@ -71,7 +71,8 @@
     "refineButton": "Refine your search", "searchButton": "Search",
     "priceMinLabel": "Minimum price", "priceMaxLabel": "Maximum price", "bedroomsLabel": "Bedrooms", "garagesLabel": "Garages",
     "parkingLabel": "Parking", "landAreaLabel": "Land area (sqm)", "floorAreaLabel": "Floor area (sqm)",
-    "noResults": "No property matches your search yet.", "viewDetails": "View details", "featuredBadge": "Featured"
+    "noResults": "No property matches your search yet.", "viewDetails": "View details", "featuredBadge": "Featured",
+    "badgeNew": "New", "badgeReserved": "Reserved", "badgeSold": "Sold"
   },
   "propertyDetail": {
     "characteristicsTitle": "Characteristics", "descriptionTitle": "Description",
@@ -81,7 +82,9 @@
     "emailLabel": "Email", "phoneLabel": "Phone number", "hasPropertyLabel": "Do you have a property to sell?",
     "yesLabel": "Yes", "noLabel": "No", "messageLabel": "Message", "sendButton": "Send",
     "successMessage": "Thank you, your message has been sent. We will reply within 24 business hours.",
-    "errorMessage": "Something went wrong, please try again."
+    "errorMessage": "Something went wrong, please try again.",
+    "printButton": "Print / PDF", "mapTitle": "Location",
+    "whatsappMessage": "Hello, I am interested in property #{id} – {title}"
   },
   "contact": {
     "eyebrow": "CONTACT US", "title": "Contact Us",
