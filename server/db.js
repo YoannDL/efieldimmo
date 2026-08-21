@@ -3,6 +3,7 @@ const Database = require('better-sqlite3');
 function createDb(dbPath) {
   const db = new Database(dbPath);
   db.pragma('journal_mode = WAL');
+  db.pragma('foreign_keys = ON');
   db.exec(`
     CREATE TABLE IF NOT EXISTS admin_users (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -51,6 +52,29 @@ function createDb(dbPath) {
       budget_range TEXT,
       message TEXT NOT NULL,
       created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+    CREATE TABLE IF NOT EXISTS search_criteria (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      slug TEXT UNIQUE NOT NULL,
+      label_fr TEXT NOT NULL,
+      label_en TEXT NOT NULL,
+      kind TEXT NOT NULL CHECK (kind IN ('number', 'boolean'))
+    );
+    CREATE TABLE IF NOT EXISTS property_criteria (
+      property_id INTEGER NOT NULL REFERENCES properties(id) ON DELETE CASCADE,
+      criterion_id INTEGER NOT NULL REFERENCES search_criteria(id) ON DELETE CASCADE,
+      value REAL NOT NULL,
+      PRIMARY KEY (property_id, criterion_id)
+    );
+    CREATE TABLE IF NOT EXISTS settings (
+      key TEXT PRIMARY KEY,
+      value TEXT NOT NULL
+    );
+    CREATE TABLE IF NOT EXISTS content_overrides (
+      lang TEXT NOT NULL,
+      key TEXT NOT NULL,
+      value TEXT NOT NULL,
+      PRIMARY KEY (lang, key)
     );
     CREATE TABLE IF NOT EXISTS page_views (
       path TEXT NOT NULL,

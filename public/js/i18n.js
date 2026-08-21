@@ -2,7 +2,9 @@
   const STORAGE_KEY = 'efield-lang';
 
   async function loadDictionary(lang) {
-    const res = await fetch(`/i18n/${lang}.json`);
+    // Served by the backend so admin content edits (stored in the database)
+    // override the default texts shipped in /i18n/*.json
+    const res = await fetch(`/api/i18n/${lang}`);
     return res.json();
   }
 

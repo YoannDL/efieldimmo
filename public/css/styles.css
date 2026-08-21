@@ -75,6 +75,9 @@ p { margin: 0 0 1em; }
 .search-bar select, .search-bar input { padding: 0.5em; border-radius: 4px; border: none; min-width: 160px; font-family: var(--font-body); }
 .search-advanced { flex-basis: 100%; display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-top: 1rem; }
 .search-advanced input { width: 100%; min-width: 0; }
+.search-advanced .crit-check { display: flex; align-items: flex-end; padding-bottom: 0.4em; }
+.search-advanced .crit-check label { display: flex; align-items: center; gap: 0.5em; margin: 0; cursor: pointer; }
+.search-advanced .crit-check input[type="checkbox"] { width: auto; min-width: 0; }
 .search-toggle { background: none; border: none; color: var(--color-cream); text-decoration: underline; cursor: pointer; font-family: var(--font-body); }
 
 .form-field { margin-bottom: 1rem; }

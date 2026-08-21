@@ -29,12 +29,33 @@
     });
   }
 
+  async function applySiteSettings() {
+    try {
+      const settings = await (await fetch('/api/settings')).json();
+      window.__efieldSettings = settings;
+      document.querySelectorAll('[data-setting]').forEach((el) => {
+        const value = settings[el.getAttribute('data-setting')];
+        if (value) el.textContent = value;
+      });
+      document.querySelectorAll('[data-setting-href]').forEach((el) => {
+        const value = settings[el.getAttribute('data-setting-href')];
+        if (value) el.setAttribute('href', value);
+      });
+      const whatsapp = document.querySelector('.whatsapp-button');
+      if (whatsapp && settings.whatsapp_number) {
+        whatsapp.setAttribute('href', `https://wa.me/${settings.whatsapp_number}`);
+      }
+      document.dispatchEvent(new CustomEvent('efield:settings-loaded', { detail: settings }));
+    } catch (e) { /* settings are cosmetic; the page must still render */ }
+  }
+
   window.EfieldPartials = {
     init: async function () {
       await Promise.all([
         includePartial('#site-header', '/partials/header.html'),
         includePartial('#site-footer', '/partials/footer.html')
       ]);
+      await applySiteSettings();
       highlightActiveNavLink();
       wireMobileNavToggle();
       fetch('/api/track', {

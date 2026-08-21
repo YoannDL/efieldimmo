@@ -6,6 +6,7 @@ const bcrypt = require('bcryptjs');
 const multer = require('multer');
 const sharp = require('sharp');
 const { requireAdmin } = require('../middleware/auth');
+const { LANGS, DEFAULT_SETTINGS, loadDefaultDict, flattenKeys, getByPath, mergedDictionary } = require('../content');
 
 const UPLOAD_DIR = path.join(__dirname, '..', '..', 'public', 'img', 'properties');
 
@@ -37,6 +38,25 @@ function pickPropertyFields(body) {
   out.featured_order = Number(out.featured_order || 0);
   out.map_url = out.map_url || null;
   return out;
+}
+
+function slugify(text) {
+  return text.normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+}
+
+function saveCriteriaValues(db, propertyId, criteria) {
+  if (criteria === undefined) return;
+  db.prepare('DELETE FROM property_criteria WHERE property_id = ?').run(propertyId);
+  if (!criteria || typeof criteria !== 'object') return;
+  const insert = db.prepare('INSERT OR REPLACE INTO property_criteria (property_id, criterion_id, value) VALUES (?, ?, ?)');
+  const exists = db.prepare('SELECT id FROM search_criteria WHERE id = ?');
+  for (const [criterionId, rawValue] of Object.entries(criteria)) {
+    const value = Number(rawValue);
+    if (!Number.isFinite(value) || value <= 0) continue;
+    if (!exists.get(criterionId)) continue;
+    insert.run(propertyId, Number(criterionId), value);
+  }
 }
 
 function createAdminRouter(db) {
@@ -72,6 +92,7 @@ function createAdminRouter(db) {
         @price, @currency, @bedrooms, @garages, @parking, @land_area_m2, @floor_area_m2, @featured,
         @availability, @featured_order, @map_url)
     `).run(fields);
+    saveCriteriaValues(db, info.lastInsertRowid, (req.body || {}).criteria);
     res.status(201).json({ id: info.lastInsertRowid });
   });
 
@@ -87,6 +108,7 @@ function createAdminRouter(db) {
         availability=@availability, featured_order=@featured_order, map_url=@map_url
       WHERE id=@id
     `).run({ ...fields, id: req.params.id });
+    saveCriteriaValues(db, Number(req.params.id), (req.body || {}).criteria);
     res.json({ id: Number(req.params.id) });
   });
 
@@ -156,6 +178,45 @@ function createAdminRouter(db) {
     res.json({ ok: true });
   });
 
+  router.get('/content', (req, res) => {
+    const lang = LANGS.includes(req.query.lang) ? req.query.lang : 'fr';
+    const merged = mergedDictionary(db, lang);
+    const overridden = new Set(db.prepare('SELECT key FROM content_overrides WHERE lang = ?').all(lang).map((r) => r.key));
+    const entries = flattenKeys(loadDefaultDict(lang)).map((key) => ({
+      key,
+      value: getByPath(merged, key),
+      overridden: overridden.has(key)
+    }));
+    res.json(entries);
+  });
+
+  router.put('/content', (req, res) => {
+    const { lang, key, value } = req.body || {};
+    if (!LANGS.includes(lang) || !key || typeof value !== 'string') {
+      return res.status(400).json({ error: 'lang, key and value are required' });
+    }
+    if (getByPath(loadDefaultDict(lang), key) === undefined) {
+      return res.status(400).json({ error: 'Unknown content key' });
+    }
+    if (value === '') {
+      db.prepare('DELETE FROM content_overrides WHERE lang = ? AND key = ?').run(lang, key);
+    } else {
+      db.prepare('INSERT OR REPLACE INTO content_overrides (lang, key, value) VALUES (?, ?, ?)').run(lang, key, value);
+    }
+    res.json({ ok: true });
+  });
+
+  router.put('/settings', (req, res) => {
+    const updates = req.body || {};
+    const allowed = Object.keys(DEFAULT_SETTINGS);
+    for (const key of Object.keys(updates)) {
+      if (!allowed.includes(key)) return res.status(400).json({ error: `Unknown setting: ${key}` });
+    }
+    const upsert = db.prepare('INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)');
+    for (const [key, value] of Object.entries(updates)) upsert.run(key, String(value));
+    res.json({ ok: true });
+  });
+
   router.get('/stats', (req, res) => {
     const rows = db.prepare(`
       SELECT path, SUM(views) AS views FROM page_views
@@ -174,8 +235,7 @@ function createAdminRouter(db) {
     if (!label_fr || !label_en) {
       return res.status(400).json({ error: 'label_fr and label_en are required' });
     }
-    const value = label_fr.normalize('NFD').replace(/[̀-ͯ]/g, '')
-      .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+    const value = slugify(label_fr);
     const existing = db.prepare('SELECT id FROM property_types WHERE value = ?').get(value);
     if (existing) return res.status(409).json({ error: 'This type already exists' });
     const info = db.prepare('INSERT INTO property_types (value, label_fr, label_en) VALUES (?, ?, ?)').run(value, label_fr, label_en);
@@ -184,6 +244,27 @@ function createAdminRouter(db) {
 
   router.delete('/types/:id', (req, res) => {
     db.prepare('DELETE FROM property_types WHERE id = ?').run(req.params.id);
+    res.json({ ok: true });
+  });
+
+  router.get('/criteria', (req, res) => {
+    res.json(db.prepare('SELECT * FROM search_criteria ORDER BY label_fr').all());
+  });
+
+  router.post('/criteria', (req, res) => {
+    const { label_fr, label_en, kind } = req.body || {};
+    if (!label_fr || !label_en || !['number', 'boolean'].includes(kind)) {
+      return res.status(400).json({ error: 'label_fr, label_en and kind (number|boolean) are required' });
+    }
+    const slug = slugify(label_fr);
+    const existing = db.prepare('SELECT id FROM search_criteria WHERE slug = ?').get(slug);
+    if (existing) return res.status(409).json({ error: 'This criterion already exists' });
+    const info = db.prepare('INSERT INTO search_criteria (slug, label_fr, label_en, kind) VALUES (?, ?, ?, ?)').run(slug, label_fr, label_en, kind);
+    res.status(201).json({ id: info.lastInsertRowid, slug, label_fr, label_en, kind });
+  });
+
+  router.delete('/criteria/:id', (req, res) => {
+    db.prepare('DELETE FROM search_criteria WHERE id = ?').run(req.params.id);
     res.json({ ok: true });
   });
 

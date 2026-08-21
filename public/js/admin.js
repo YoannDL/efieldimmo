@@ -94,11 +94,15 @@
       document.getElementById('property-form-title').textContent = 'Modifier le bien';
       const property = await (await api(`/api/properties/${id}`)).json();
       fillFormWithProperty(property);
+      const criteriaValues = {};
+      (property.criteria || []).forEach((c) => { criteriaValues[c.id] = c.value; });
+      renderPropertyCriteriaFields(criteriaValues);
       document.getElementById('image-upload-section').hidden = false;
       renderImageThumbs(property);
     } else {
       currentEditId = null;
       document.getElementById('property-form-title').textContent = 'Nouveau bien';
+      renderPropertyCriteriaFields({});
     }
   }
 
@@ -115,6 +119,7 @@
       event.preventDefault();
       const data = Object.fromEntries(new FormData(form).entries());
       data.featured = form.elements.namedItem('featured').checked;
+      data.criteria = collectCriteriaValues();
       const method = currentEditId ? 'PUT' : 'POST';
       const url = currentEditId ? `/admin/api/properties/${currentEditId}` : '/admin/api/properties';
       const res = await api(url, {
@@ -201,8 +206,9 @@
           panel.hidden = panel.id !== `tab-${tab}`;
         });
         if (tab === 'inquiries') loadInquiries();
-        if (tab === 'types') loadTypes();
+        if (tab === 'types') { loadTypes(); loadCriteria(); }
         if (tab === 'stats') loadStats();
+        if (tab === 'content') { loadSettings(); loadContent(); }
       });
     });
   }
@@ -244,6 +250,155 @@
     allTypes = await res.json();
     renderTypesTable();
     renderPropertyTypeSelect();
+  }
+
+  /* ---------- Search criteria ---------- */
+
+  let allCriteria = [];
+
+  function renderPropertyCriteriaFields(values = {}) {
+    const container = document.getElementById('property-criteria-fields');
+    if (!container) return;
+    const section = document.getElementById('property-criteria-section');
+    section.hidden = allCriteria.length === 0;
+    container.innerHTML = allCriteria.map((c) => c.kind === 'boolean'
+      ? `<div class="form-field"><label><input type="checkbox" data-criterion-input="${c.id}"${values[c.id] ? ' checked' : ''}> ${c.label_fr}</label></div>`
+      : `<div class="form-field"><label>${c.label_fr}</label><input type="number" min="0" data-criterion-input="${c.id}" value="${values[c.id] != null ? values[c.id] : ''}"></div>`
+    ).join('');
+  }
+
+  function collectCriteriaValues() {
+    const values = {};
+    document.querySelectorAll('[data-criterion-input]').forEach((input) => {
+      const id = input.getAttribute('data-criterion-input');
+      if (input.type === 'checkbox') {
+        if (input.checked) values[id] = 1;
+      } else if (input.value !== '' && Number(input.value) > 0) {
+        values[id] = Number(input.value);
+      }
+    });
+    return values;
+  }
+
+  function renderCriteriaTable() {
+    const tbody = document.getElementById('criteria-tbody');
+    if (!tbody) return;
+    tbody.innerHTML = allCriteria.map((c) => `
+      <tr>
+        <td>${c.label_fr}</td>
+        <td>${c.label_en}</td>
+        <td>${c.kind === 'boolean' ? 'Oui / Non' : 'Nombre'}</td>
+        <td><button type="button" data-delete-criterion="${c.id}">Supprimer</button></td>
+      </tr>
+    `).join('');
+    tbody.querySelectorAll('[data-delete-criterion]').forEach((btn) => {
+      btn.addEventListener('click', async () => {
+        if (!window.confirm('Supprimer ce critère ? Les valeurs enregistrées sur les biens seront perdues.')) return;
+        await api(`/admin/api/criteria/${btn.getAttribute('data-delete-criterion')}`, { method: 'DELETE' });
+        await loadCriteria();
+      });
+    });
+  }
+
+  async function loadCriteria() {
+    const res = await api('/admin/api/criteria');
+    allCriteria = await res.json();
+    renderCriteriaTable();
+    renderPropertyCriteriaFields();
+  }
+
+  function wireCriterionForm() {
+    const form = document.getElementById('criterion-form');
+    if (!form) return;
+    const errorEl = document.getElementById('criterion-error');
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      errorEl.hidden = true;
+      const data = Object.fromEntries(new FormData(form).entries());
+      const res = await api('/admin/api/criteria', {
+        method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(data)
+      });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        errorEl.textContent = body.error || 'Erreur lors de l\'ajout.';
+        errorEl.hidden = false;
+        return;
+      }
+      form.reset();
+      await loadCriteria();
+    });
+  }
+
+  /* ---------- Site settings & content ---------- */
+
+  async function loadSettings() {
+    const form = document.getElementById('settings-form');
+    if (!form) return;
+    const settings = await (await api('/api/settings')).json();
+    Object.entries(settings).forEach(([key, value]) => {
+      const field = form.elements.namedItem(key);
+      if (field) field.value = value;
+    });
+  }
+
+  function wireSettingsForm() {
+    const form = document.getElementById('settings-form');
+    if (!form) return;
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const data = Object.fromEntries(new FormData(form).entries());
+      const res = await api('/admin/api/settings', {
+        method: 'PUT', headers: { 'content-type': 'application/json' }, body: JSON.stringify(data)
+      });
+      const saved = document.getElementById('settings-saved');
+      saved.hidden = !res.ok;
+      setTimeout(() => { saved.hidden = true; }, 2500);
+    });
+  }
+
+  let contentLang = 'fr';
+  let contentEntries = [];
+
+  function renderContentTable() {
+    const tbody = document.getElementById('content-tbody');
+    if (!tbody) return;
+    const filter = (document.getElementById('content-filter').value || '').toLowerCase();
+    const visible = contentEntries.filter((e) =>
+      !filter || e.key.toLowerCase().includes(filter) || String(e.value).toLowerCase().includes(filter));
+    tbody.innerHTML = visible.map((e, index) => `
+      <tr>
+        <td style="font-size:0.8rem;color:var(--color-subtitle);">${e.key}${e.overridden ? ' *' : ''}</td>
+        <td><textarea data-content-key="${e.key}" rows="${String(e.value).length > 80 ? 3 : 1}" style="width:100%;">${e.value}</textarea></td>
+      </tr>
+    `).join('');
+    tbody.querySelectorAll('[data-content-key]').forEach((input) => {
+      input.addEventListener('change', async () => {
+        await api('/admin/api/content', {
+          method: 'PUT', headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ lang: contentLang, key: input.getAttribute('data-content-key'), value: input.value })
+        });
+      });
+    });
+  }
+
+  async function loadContent() {
+    const res = await api(`/admin/api/content?lang=${contentLang}`);
+    contentEntries = await res.json();
+    renderContentTable();
+  }
+
+  function wireContentControls() {
+    const filter = document.getElementById('content-filter');
+    if (!filter) return;
+    filter.addEventListener('input', renderContentTable);
+    document.querySelectorAll('[data-content-lang]').forEach((btn) => {
+      btn.addEventListener('click', async () => {
+        document.querySelectorAll('[data-content-lang]').forEach((b) => b.classList.remove('active'));
+        btn.classList.add('active');
+        contentLang = btn.getAttribute('data-content-lang');
+        await loadContent();
+      });
+    });
   }
 
   function wireTypeForm() {
@@ -290,8 +445,12 @@
     wireTabs();
     wirePropertyForm();
     wireTypeForm();
+    wireCriterionForm();
+    wireSettingsForm();
+    wireContentControls();
     wireLogout();
     await loadTypes();
+    await loadCriteria();
     await loadProperties();
   }
 

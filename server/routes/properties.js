@@ -19,6 +19,21 @@ function createPropertiesRouter(db) {
     if (minLandArea) { clauses.push('land_area_m2 >= @minLandArea'); params.minLandArea = Number(minLandArea); }
     if (minFloorArea) { clauses.push('floor_area_m2 >= @minFloorArea'); params.minFloorArea = Number(minFloorArea); }
 
+    // Admin-defined criteria filters arrive as crit_<id>=<value>; a match means
+    // the property has that criterion with a value >= the requested one
+    // (>=1 for yes/no, >=n for numeric thresholds).
+    let critIndex = 0;
+    for (const [key, rawValue] of Object.entries(req.query)) {
+      const match = key.match(/^crit_(\d+)$/);
+      if (!match || rawValue === '' || Number.isNaN(Number(rawValue))) continue;
+      const idParam = `critId${critIndex}`;
+      const valueParam = `critVal${critIndex}`;
+      clauses.push(`EXISTS (SELECT 1 FROM property_criteria pc WHERE pc.property_id = properties.id AND pc.criterion_id = @${idParam} AND pc.value >= @${valueParam})`);
+      params[idParam] = Number(match[1]);
+      params[valueParam] = Number(rawValue);
+      critIndex++;
+    }
+
     const where = clauses.length ? `WHERE ${clauses.join(' AND ')}` : '';
     const rows = db.prepare(`SELECT * FROM properties ${where} ORDER BY created_at DESC`).all(params);
     const primaryImageStmt = db.prepare('SELECT url FROM property_images WHERE property_id = ? ORDER BY sort_order LIMIT 1');
@@ -33,7 +48,12 @@ function createPropertiesRouter(db) {
     const property = db.prepare('SELECT * FROM properties WHERE id = ?').get(req.params.id);
     if (!property) return res.status(404).json({ error: 'Not found' });
     const images = db.prepare('SELECT id, url, sort_order AS sortOrder FROM property_images WHERE property_id = ? ORDER BY sort_order').all(req.params.id);
-    res.json({ ...property, images });
+    const criteria = db.prepare(`
+      SELECT sc.id, sc.slug, sc.label_fr, sc.label_en, sc.kind, pc.value
+      FROM property_criteria pc JOIN search_criteria sc ON sc.id = pc.criterion_id
+      WHERE pc.property_id = ? ORDER BY sc.label_fr
+    `).all(req.params.id);
+    res.json({ ...property, images, criteria });
   });
 
   return router;

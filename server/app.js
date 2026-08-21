@@ -7,6 +7,7 @@ const { createPropertiesRouter } = require('./routes/properties');
 const { createInquiriesRouter } = require('./routes/inquiries');
 const { createFiltersRouter } = require('./routes/filters');
 const { createTrackRouter } = require('./routes/track');
+const { createContentRouter } = require('./routes/content');
 const { createNotifier } = require('./notify');
 
 function createApp({ dbPath, sessionSecret }) {
@@ -28,6 +29,7 @@ function createApp({ dbPath, sessionSecret }) {
   app.use('/api/inquiries', createInquiriesRouter(db, createNotifier()));
   app.use('/api/filters', createFiltersRouter(db));
   app.use('/api/track', createTrackRouter(db));
+  app.use('/api', createContentRouter(db));
 
   return { app, db };
 }

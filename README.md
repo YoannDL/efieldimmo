@@ -54,6 +54,14 @@ Visit `http://localhost:3000` for the public site and
   availability (available / reserved / sold shown as badges), featured
   ordering, "Nouveauté" badge for listings under 30 days, category
   management, inquiry follow-up statuses, and a 30-day view-count report.
+- Admin-defined search criteria: create a criterion (name FR/EN + type
+  "yes/no" or "number", e.g. Piscine or Salles de bain) and it appears in
+  the public "Affiner la recherche" panel, on the property form, and in
+  the property characteristics automatically.
+- Content management: the "Contenu" admin tab edits every text on the site
+  (FR and EN, stored as database overrides on top of the defaults in
+  public/i18n/) plus site settings: WhatsApp number, displayed phone and
+  email, and social media links.
 
 ## Tests
 

@@ -14,6 +14,7 @@
 
   let lastResults = [];
   let availableTypes = [];
+  let availableCriteria = [];
   let currentProperty = null;
 
   const NEW_BADGE_DAYS = 30;
@@ -49,11 +50,39 @@
     select.value = selected && [...select.options].some((o) => o.value === selected) ? selected : select.value;
   }
 
+  function renderCriteriaFields() {
+    const container = document.getElementById('advanced-fields');
+    if (!container) return;
+    container.querySelectorAll('[data-criterion]').forEach((el) => el.remove());
+    availableCriteria.forEach((criterion) => {
+      const wrap = document.createElement('div');
+      wrap.setAttribute('data-criterion', criterion.id);
+      if (criterion.kind === 'boolean') {
+        wrap.className = 'crit-check';
+        wrap.innerHTML = `<label><input type="checkbox" name="crit_${criterion.id}" value="1"> <span data-crit-label="${criterion.id}"></span></label>`;
+      } else {
+        wrap.innerHTML = `<label for="crit_${criterion.id}" data-crit-label="${criterion.id}"></label><input type="number" id="crit_${criterion.id}" name="crit_${criterion.id}" min="0">`;
+      }
+      container.appendChild(wrap);
+    });
+    labelCriteriaFields();
+  }
+
+  function labelCriteriaFields() {
+    const lang = currentLang();
+    document.querySelectorAll('[data-crit-label]').forEach((el) => {
+      const criterion = availableCriteria.find((c) => c.id === Number(el.getAttribute('data-crit-label')));
+      if (criterion) el.textContent = lang === 'en' ? criterion.label_en : criterion.label_fr;
+    });
+  }
+
   async function loadFilters() {
     const res = await fetch('/api/filters');
     const filters = await res.json();
     availableTypes = filters.types;
+    availableCriteria = filters.criteria || [];
     renderTypeOptions();
+    renderCriteriaFields();
     const datalist = document.getElementById('location-suggestions');
     if (datalist) {
       datalist.innerHTML = filters.locations.map((loc) => `<option value="${loc}"></option>`).join('');
@@ -125,20 +154,23 @@
 
   /* ---------- Property detail modal ---------- */
 
-  const WHATSAPP_BASE = 'https://wa.me/23057000000';
+  function whatsappBase() {
+    const number = (window.__efieldSettings && window.__efieldSettings.whatsapp_number) || '23057000000';
+    return `https://wa.me/${number}`;
+  }
 
   function updateWhatsAppLink(property) {
     const button = document.querySelector('.whatsapp-button');
     if (!button) return;
     if (!property) {
-      button.setAttribute('href', WHATSAPP_BASE);
+      button.setAttribute('href', whatsappBase());
       return;
     }
     const lang = currentLang();
     const title = lang === 'en' ? property.title_en : property.title_fr;
     const message = (t('propertyDetail.whatsappMessage') || 'Bonjour, bien #{id} – {title}')
       .replace('{id}', property.id).replace('{title}', title);
-    button.setAttribute('href', `${WHATSAPP_BASE}?text=${encodeURIComponent(message)}`);
+    button.setAttribute('href', `${whatsappBase()}?text=${encodeURIComponent(message)}`);
   }
 
   function renderModal(property) {
@@ -168,6 +200,11 @@
     if (property.parking) characteristics.push([t('propertyDetail.parkingLabel'), property.parking]);
     if (property.land_area_m2) characteristics.push([t('propertyDetail.landAreaLabel'), `${property.land_area_m2} m²`]);
     if (property.floor_area_m2) characteristics.push([t('propertyDetail.floorAreaLabel'), `${property.floor_area_m2} m²`]);
+    (property.criteria || []).forEach((criterion) => {
+      const label = lang === 'en' ? criterion.label_en : criterion.label_fr;
+      const value = criterion.kind === 'boolean' ? t('propertyDetail.yesLabel') : criterion.value;
+      characteristics.push([label, value]);
+    });
     characteristics.push([t('propertyDetail.priceLabel'), formatPrice(property)]);
     document.getElementById('modal-characteristics').innerHTML = characteristics
       .map(([label, value]) => `<div><strong>${label}</strong><div>${value}</div></div>`).join('');
@@ -256,6 +293,7 @@
   document.addEventListener('efield:lang-changed', () => {
     renderResults(lastResults);
     renderTypeOptions();
+    labelCriteriaFields();
     if (currentProperty) renderModal(currentProperty);
   });
 })();

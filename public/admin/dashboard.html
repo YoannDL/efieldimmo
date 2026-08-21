@@ -21,6 +21,7 @@
     <div class="tab-buttons">
       <button type="button" data-tab="properties" class="active">Biens</button>
       <button type="button" data-tab="types">Catégories</button>
+      <button type="button" data-tab="content">Contenu</button>
       <button type="button" data-tab="inquiries">Messages</button>
       <button type="button" data-tab="stats">Statistiques</button>
     </div>
@@ -66,6 +67,10 @@
           </div>
           <div class="form-field"><label>Description (FR)</label><textarea name="description_fr" rows="3" required></textarea></div>
           <div class="form-field"><label>Description (EN)</label><textarea name="description_en" rows="3" required></textarea></div>
+          <div id="property-criteria-section">
+            <h3>Critères</h3>
+            <div class="property-form-grid" id="property-criteria-fields"></div>
+          </div>
           <button type="submit" class="btn btn-primary">Enregistrer</button>
           <button type="button" class="btn btn-outline-dark" id="cancel-property-btn">Annuler</button>
         </form>
@@ -90,6 +95,57 @@
         <table class="admin-table">
           <thead><tr><th>Nom (FR)</th><th>Nom (EN)</th><th>Valeur technique</th><th></th></tr></thead>
           <tbody id="types-tbody"></tbody>
+        </table>
+      </div>
+
+      <h2 style="margin-top:2.5rem;">Critères de recherche</h2>
+      <p>Ces critères apparaissent dans « Affiner la recherche » du site public et dans le formulaire des biens. Type « Oui / Non » = case à cocher (ex : Piscine), « Nombre » = valeur minimale (ex : Salles de bain).</p>
+      <form id="criterion-form" style="display:flex;gap:1rem;flex-wrap:wrap;align-items:flex-end;">
+        <div class="form-field" style="margin-bottom:0;"><label>Nom (FR)</label><input type="text" name="label_fr" required></div>
+        <div class="form-field" style="margin-bottom:0;"><label>Nom (EN)</label><input type="text" name="label_en" required></div>
+        <div class="form-field" style="margin-bottom:0;"><label>Type</label>
+          <select name="kind">
+            <option value="boolean">Oui / Non</option>
+            <option value="number">Nombre</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Ajouter</button>
+      </form>
+      <p class="form-error" id="criterion-error" hidden></p>
+      <div class="table-scroll">
+        <table class="admin-table">
+          <thead><tr><th>Nom (FR)</th><th>Nom (EN)</th><th>Type</th><th></th></tr></thead>
+          <tbody id="criteria-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="tab-panel" id="tab-content" hidden>
+      <h2>Réglages du site</h2>
+      <form id="settings-form">
+        <div class="property-form-grid">
+          <div class="form-field"><label>Numéro WhatsApp (format international sans +)</label><input type="text" name="whatsapp_number"></div>
+          <div class="form-field"><label>Téléphone affiché</label><input type="text" name="phone_display"></div>
+          <div class="form-field"><label>Email affiché</label><input type="text" name="email"></div>
+          <div class="form-field"><label>Lien Facebook</label><input type="url" name="facebook_url"></div>
+          <div class="form-field"><label>Lien Instagram</label><input type="url" name="instagram_url"></div>
+          <div class="form-field"><label>Lien TikTok</label><input type="url" name="tiktok_url"></div>
+        </div>
+        <button type="submit" class="btn btn-primary">Enregistrer les réglages</button>
+        <span class="form-success" id="settings-saved" hidden>Enregistré.</span>
+      </form>
+
+      <h2 style="margin-top:2.5rem;">Textes du site</h2>
+      <p>Modifiez n'importe quel texte du site. Un champ vidé revient au texte d'origine. Les modifications sont enregistrées dès que vous quittez le champ.</p>
+      <div class="tab-buttons">
+        <button type="button" data-content-lang="fr" class="active">Français</button>
+        <button type="button" data-content-lang="en">English</button>
+      </div>
+      <input type="search" id="content-filter" placeholder="Filtrer les textes (ex : accueil, contact...)" style="width:100%;max-width:420px;padding:0.5em;margin-bottom:1rem;">
+      <div class="table-scroll">
+        <table class="admin-table">
+          <thead><tr><th style="width:30%;">Clé</th><th>Texte</th></tr></thead>
+          <tbody id="content-tbody"></tbody>
         </table>
       </div>
     </div>
