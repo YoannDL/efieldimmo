@@ -51,7 +51,7 @@ p { margin: 0 0 1em; }
 
 .hero { position: relative; min-height: 80vh; display: flex; align-items: flex-end; background-size: cover; background-position: center; color: #fff; }
 .hero::before { content: ''; position: absolute; inset: 0; background: linear-gradient(0deg, rgba(0,0,0,0.55), rgba(0,0,0,0.15)); }
-.hero-content { position: relative; padding: 3rem 0; }
+.hero-content { position: relative; padding-top: 3rem; padding-bottom: 3rem; }
 .hero-content h1 { color: #fff; }
 .hero-buttons { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 1.5rem; }
 
